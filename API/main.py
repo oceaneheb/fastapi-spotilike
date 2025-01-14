@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends
-from typing import Annotated
+from typing import Annotated, List
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import SessionLocal, engine
@@ -17,6 +17,29 @@ app.add_middleware(
 	allow_origins=origins,
 )
 
+class UserBase(BaseModel):
+	name: str
+	email: str 
+	password: str
+
+class UserModel(UserBase):
+	id: int
+
+	class Config:
+		orm_mode = True
+
+class AlbumBase(BaseModel):
+	title: str
+	cover: str
+	artist_id: int
+	release_date: str
+
+class AlbumModel(AlbumBase):
+	id: int
+
+	class Config:
+		orm_mode = True
+
 def get_db():
 	db = SessionLocal()
 	try:
@@ -27,3 +50,22 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 models.Base.metadata.create_all(bind=engine)
+
+# Endpoints
+
+# Users
+# Créer un nouvel utilisateur
+@app.post("/users/", response_model=UserModel)
+async def create_user(user: UserBase, db: db_dependency):
+	db_user = models.User(**user.dict())
+	db.add(db_user)
+	db.commit()
+	db.refresh(db_user)
+	return db_user
+
+# Albums
+# Récupère la liste de tous les albums
+@app.get("/users", response_model=List[AlbumModel])
+async def read_albums(db: db_dependency, skip: int = 0, limit: int = 100):
+	albums = db.query(models.Album).offset(skip).limit(limit).all()
+	return albums
