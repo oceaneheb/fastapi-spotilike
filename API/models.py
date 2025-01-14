@@ -27,7 +27,7 @@ class Song(Base):
     title = Column(String)
     artist_id = Column(Integer, ForeignKey("artists.id"))
     album_id = Column(Integer, ForeignKey("albums.id"))
-    year = Column(Integer)
+    release_date = Column(String)
     artist = relationship("Artist", back_populates="songs") # Many-to-One
     album = relationship("Album", back_populates="songs") # Many-to-One
     genres = relationship("Genre", secondary="song_genre", back_populates="songs") # Many-to-many relationship with Genre through the association table
