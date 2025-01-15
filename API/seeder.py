@@ -2,51 +2,53 @@ from sqlalchemy.orm import Session
 from models import User, Artist, Album, Song, Genre, SongGenre
 
 def seed_data(session: Session):
+    path_to_artists_avatars = "static/images/artists/"
+    path_to_albums_covers = "static/images/albums/"
+
     # Seed Users
-    user1 = User(name="John Doe", email="john@example.com", password="password123")
+    user1 = User(name="John Doe",email="john@example.com", password="password123")
     user2 = User(name="Jane Smith", email="jane@example.com", password="password456")
     
 
     # Seed Artists
-    artist1 = Artist(name="The Beatles", avatar="beatles.jpg", biography="Legendary band from Liverpool")
-    artist2 = Artist(name="Taylor Swift", avatar="taylor.jpg", biography="American singer-songwriter")
+    artist1 = Artist(name="The Beatles", avatar=f"{path_to_artists_avatars}TheBeatles.jpg", biography="Legendary band from Liverpool")
+    artist2 = Artist(name="Taylor Swift", avatar=f"{path_to_artists_avatars}TaylorSwift.jpg", biography="American singer-songwriter")
 
     # Seed Albums
-    # Beatles
-    album1 = Album(title="Abbey Road", artist=artist1, release_date="1969-09-26")
-    album2 = Album(title="Sgt. Pepper's Lonely Hearts Club Band", artist=artist1, release_date="1967-05-26")
-    album3 = Album(title="Revolver", artist=artist1, release_date="1966-08-05")
-    # Taylor
-    album4 = Album(title="1989", artist=artist2, release_date="2014-10-27")
-    album5 = Album(title="Red", artist=artist2, release_date="2012-10-22")
-    album6 = Album(title="Fearless", artist=artist2, release_date="2008-11-11")
+	# Beatles
+    album1 = Album(title="Abbey Road", artist=artist1, release_date="1969-09-26", cover=f"{path_to_albums_covers}AbbeyRoad.jpg")
+    album2 = Album(title="Sgt. Pepper's Lonely Hearts Club Band", artist=artist1, release_date="1967-05-26", cover=f"{path_to_albums_covers}SgtPepper.jpg")
+    album3 = Album(title="Revolver", artist=artist1, release_date="1966-08-05", cover=f"{path_to_albums_covers}Revolver.jpg")
+	# Taylor
+    album4 = Album(title="1989", artist=artist2, release_date="2014-10-27", cover=f"{path_to_albums_covers}1989.jpg")
+    album5 = Album(title="Red", artist=artist2, release_date="2012-10-22", cover=f"{path_to_albums_covers}Red.jpg")
+    album6 = Album(title="Fearless", artist=artist2, release_date="2008-11-11", cover=f"{path_to_albums_covers}Fearless.jpg")
 
     # Seed Songs
     # Abbey Road
-    song1 = Song(title="Come Together", album=album1)
-    song2 = Song(title="Something", album=album1)
-    song3 = Song(title="Maxwell's Silver Hammer", album=album1)
+    song1 = Song(title="Come Together", album=album1, release_date="1969-09-26", artist_id=1)
+    song2 = Song(title="Something", album=album1, release_date="1969-09-26", artist_id=1)
+    song3 = Song(title="Maxwell's Silver Hammer", album=album1, release_date="1969-09-26", artist_id=1)
     # Sgt. Pepper
-    song4 = Song(title="Sgt. Pepper's Lonely Hearts Club Band", album=album2)
-    song5 = Song(title="With a Little Help from My Friends", album=album2)
-    song6 = Song(title="Lucy in the Sky with Diamonds", album=album2)
-    # Revolver
-    song7 = Song(title="Taxman", album=album3)
-    song8 = Song(title="Eleanor Rigby", album=album3)
-    song9 = Song(title="Yellow Submarine", album=album3)
+    song4 = Song(title="Sgt. Pepper's Lonely Hearts Club Band", album=album2, release_date="1967-05-26", artist_id=1)
+    song5 = Song(title="With a Little Help from My Friends", album=album2, release_date="1967-05-26", artist_id=1)
+    song6 = Song(title="Lucy in the Sky with Diamonds", album=album2, release_date="1967-05-26", artist_id=1)
+	# Revolver
+    song7 = Song(title="Taxman", album=album3, release_date="1966-08-05", artist_id=1)
+    song8 = Song(title="Eleanor Rigby", album=album3, release_date="1966-08-05", artist_id=1)
+    song9 = Song(title="Yellow Submarine", album=album3, release_date="1966-08-05", artist_id=1)
     # 1989
-    song10 = Song(title="Welcome to New York", album=album4)
-    song11 = Song(title="Blank Space", album=album4)
-    song12 = Song(title="Style", album=album4)
-    # Red
-    song13 = Song(title="State of Grace", album=album5)
-    song14 = Song(title="Red", album=album5)
-    song15 = Song(title="Treacherous", album=album5)
-    # Fearless
-    song16 = Song(title="Fearless", album=album6)
-    song17 = Song(title="Fifteen", album=album6)
-    song18 = Song(title="Love Story", album=album6)
-    
+    song10 = Song(title="Welcome to New York", album=album4, release_date="2014-10-27", artist_id=2)
+    song11 = Song(title="Blank Space", album=album4, release_date="2014-10-27", artist_id=2)
+    song12 = Song(title="Style", album=album4, release_date="2014-10-27", artist_id=2)
+	# Red
+    song13 = Song(title="State of Grace", album=album5, release_date="2012-10-22", artist_id=2)
+    song14 = Song(title="Red", album=album5, release_date="2012-10-22", artist_id=2)
+    song15 = Song(title="Treacherous", album=album5, release_date="2012-10-22", artist_id=2)
+	# Fearless
+    song16 = Song(title="Fearless", album=album6, release_date="2008-11-11", artist_id=2)
+    song17 = Song(title="Fifteen", album=album6, release_date="2008-11-11", artist_id=2)
+    song18 = Song(title="Love Story", album=album6, release_date="2008-11-11", artist_id=2)
 
     # Seed Genres
     genre1 = Genre(name="Rock")
@@ -62,7 +64,6 @@ def seed_data(session: Session):
 
     # Add data to the session
     session.add_all([user1, user2, artist1, artist2, album1, album2, album3, album4, album5, album6, song1, song2, song3, song4, song5, song6, song7, song8, song9, song10, song11, song12, song13, song14, song15, song16, song17, song18, genre1, genre2, genre3, genre4, genre5, genre6, genre7, genre8, genre9, genre10])
-    session.commit()
     
     session.commit()  # Commit the initial data to get generate the IDs
 
