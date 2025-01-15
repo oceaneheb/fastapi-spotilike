@@ -59,6 +59,7 @@ class GenreModel(GenreBase):
 
 	class Config:
 		orm_mode = True
+
 class SongBase(BaseModel):
 	title: str
 	album_id: int
@@ -86,7 +87,7 @@ models.Base.metadata.create_all(bind=engine)
 
 # Users
 # Créer un nouvel utilisateur
-@app.post("/users/", response_model=UserModel)
+@app.post("/api/users/", response_model=UserModel)
 async def create_user(user: UserBase, db: db_dependency):
 	db_user = models.User(**user.dict())
 	db.add(db_user)
@@ -95,7 +96,7 @@ async def create_user(user: UserBase, db: db_dependency):
 	return db_user
 
 # Supprimer un utilisateur par id
-@app.delete("/users/{user_id}", response_model=UserModel)
+@app.delete("/api/users/{user_id}", response_model=UserModel)
 async def delete_user(user_id: int, db: db_dependency):
 	db_user = db.query(models.User).filter(models.User.id == user_id).first()
 	if db_user is None:
@@ -106,13 +107,13 @@ async def delete_user(user_id: int, db: db_dependency):
 
 # Albums
 # Récupère la liste de tous les albums
-@app.get("/albums/", response_model=List[AlbumModel])
+@app.get("/api/albums/", response_model=List[AlbumModel])
 async def get_albums(db: db_dependency):
 	albums = db.query(models.Album).all()
 	return albums
 
 # Récupère les détails de l'album précisé par id
-@app.get("/albums/{album_id}", response_model=AlbumModel)
+@app.get("/api/albums/{album_id}", response_model=AlbumModel)
 async def get_album(album_id: int, db: db_dependency):
 	album = db.query(models.Album).filter(models.Album.id == album_id).first()
 	if not album:
@@ -120,7 +121,7 @@ async def get_album(album_id: int, db: db_dependency):
 	return album
 
 # Ajout d'un album
-@app.post("/albums/", response_model=AlbumModel)
+@app.post("/api/albums/", response_model=AlbumModel)
 async def create_album(album: AlbumBase, db: db_dependency):
 	db_album = models.Album(**album.dict())
 	db.add(db_album)
@@ -129,7 +130,7 @@ async def create_album(album: AlbumBase, db: db_dependency):
 	return db_album
 
 # Supprimer un album par id
-@app.delete("/albums/{album_id}", response_model=AlbumModel)
+@app.delete("/api/albums/{album_id}", response_model=AlbumModel)
 async def delete_album(album_id: int, db: db_dependency):
 	db_album = db.query(models.Album).filter(models.Album.id == album_id).first()
 	if db_album is None:
@@ -140,14 +141,14 @@ async def delete_album(album_id: int, db: db_dependency):
 
 # Genres
 # Récupère la liste de tous les genres
-@app.get("/genres", response_model=List[GenreModel])
+@app.get("/api/genres", response_model=List[GenreModel])
 async def get_genres(db: db_dependency):
 	genres = db.query(models.Genre).all()
 	return genres
 
 # Artists
 # Supprimer un artiste par id
-@app.delete("/artists/{artist_id}", response_model=ArtistModel)
+@app.delete("/api/artists/{artist_id}", response_model=ArtistModel)
 async def delete_artist(artist_id: int, db: db_dependency):
 	db_artist = db.query(models.Artist).filter(models.Artist.id == artist_id).first()
 	if db_artist is None:
@@ -155,14 +156,15 @@ async def delete_artist(artist_id: int, db: db_dependency):
 	db.delete(db_artist)
 	db.commit()
 	return db_artist
-@app.get("/users", response_model=List[AlbumModel])
+
+@app.get("/api/users", response_model=List[AlbumModel])
 async def read_albums(db: db_dependency, skip: int = 0, limit: int = 100):
 	albums = db.query(models.Album).offset(skip).limit(limit).all()
 	return albums
 
 # Songs
 # Get all songs from an album using the album ID
-@app.get("/albums/{album_id}/songs", response_model=List[SongModel])
+@app.get("/api/albums/{album_id}/songs", response_model=List[SongModel])
 async def read_songs_from_album(album_id: int, db: db_dependency):
 	songs = db.query(models.Song).filter(models.Song.album_id == album_id).all()
 	if not songs:
@@ -170,7 +172,7 @@ async def read_songs_from_album(album_id: int, db: db_dependency):
 	return songs
 
 # Get all songs from an artist using the artist ID
-@app.get("/artists/{artist_id}/songs", response_model=List[SongModel])
+@app.get("/api/artists/{artist_id}/songs", response_model=List[SongModel])
 async def read_songs_from_artist(artist_id: int, db: db_dependency):
 	songs = db.query(models.Song).filter(models.Song.artist_id == artist_id).all()
 	if not songs:
@@ -178,7 +180,7 @@ async def read_songs_from_artist(artist_id: int, db: db_dependency):
 	return songs
 
 # Add a new song to an album using the album ID
-@app.post("/albums/{album_id}/songs", response_model=SongModel)
+@app.post("/api/albums/{album_id}/songs", response_model=SongModel)
 async def create_song_for_album(album_id: int, song: SongBase, db: db_dependency):
 	album = db.query(models.Album).filter(models.Album.id == album_id).first()
 	if not album:
@@ -191,13 +193,37 @@ async def create_song_for_album(album_id: int, song: SongBase, db: db_dependency
 	return new_song
 
 # Modify an artist's information using the artist ID
-@app.put("/artists/{artist_id}", response_model=ArtistModel)
+@app.put("/api/artists/{artist_id}", response_model=ArtistModel)
 async def update_artist(artist_id: int, artist: ArtistBase, db: db_dependency):
-	artist = db.query(models.Artist).filter(models.Artist.id == artist_id).first()
-	if not artist:
+	db_artist = db.query(models.Artist).filter(models.Artist.id == artist_id).first()
+	if not db_artist:
 		raise HTTPException(status_code=404, detail="Artist not found")
 	for key, value in artist.dict().items():
-		setattr(artist, key, value)
+		setattr(db_artist, key, value)
 	db.commit()
-	db.refresh(artist)
-	return artist
+	db.refresh(db_artist)
+	return db_artist
+
+# Modify an album's information using the album ID
+@app.put("/api/albums/{album_id}", response_model=AlbumModel)
+async def update_album(album_id: int, album: AlbumBase, db: db_dependency):
+	db_album = db.query(models.Album).filter(models.Album.id == album_id).first()
+	if not db_album:
+		raise HTTPException(status_code=404, detail="Album not found")
+	for key, value in album.dict().items():
+		setattr(db_album, key, value)
+	db.commit()
+	db.refresh(db_album)
+	return db_album
+
+# Modify a genre's information using the genre ID
+@app.put("/api/genres/{genre_id}", response_model=GenreModel)
+async def update_genre(genre_id: int, genre: GenreBase, db: db_dependency):
+	db_genre = db.query(models.Genre).filter(models.Genre.id == genre_id).first()
+	if not db_genre:
+		raise HTTPException(status_code=404, detail="Genre not found")
+	for key, value in genre.dict().items():
+		setattr(db_genre, key, value)
+	db.commit()
+	db.refresh(db_genre)
+	return db_genre
