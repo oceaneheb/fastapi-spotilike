@@ -44,7 +44,6 @@ class AlbumBase(BaseModel):
 	cover: str
 	artist_id: int
 	release_date: str
-	artist: ArtistBase
 
 class AlbumModel(AlbumBase):
 	id: int
@@ -54,7 +53,21 @@ class AlbumModel(AlbumBase):
 
 class GenreBase(BaseModel):
 	name: str
+	
 class GenreModel(GenreBase):
+	id: int
+
+	class Config:
+		orm_mode = True
+class SongBase(BaseModel):
+	title: str
+	album_id: int
+	artist_id: int
+	release_date: str
+
+class SongModel(SongBase):
+	id: int
+
 	class Config:
 		orm_mode = True
 
@@ -142,3 +155,49 @@ async def delete_artist(artist_id: int, db: db_dependency):
 	db.delete(db_artist)
 	db.commit()
 	return db_artist
+@app.get("/users", response_model=List[AlbumModel])
+async def read_albums(db: db_dependency, skip: int = 0, limit: int = 100):
+	albums = db.query(models.Album).offset(skip).limit(limit).all()
+	return albums
+
+# Songs
+# Get all songs from an album using the album ID
+@app.get("/albums/{album_id}/songs", response_model=List[SongModel])
+async def read_songs_from_album(album_id: int, db: db_dependency):
+	songs = db.query(models.Song).filter(models.Song.album_id == album_id).all()
+	if not songs:
+		raise HTTPException(status_code=404, detail="Album not found or no songs available")
+	return songs
+
+# Get all songs from an artist using the artist ID
+@app.get("/artists/{artist_id}/songs", response_model=List[SongModel])
+async def read_songs_from_artist(artist_id: int, db: db_dependency):
+	songs = db.query(models.Song).filter(models.Song.artist_id == artist_id).all()
+	if not songs:
+		raise HTTPException(status_code=404, detail="Artist not found or no songs available")
+	return songs
+
+# Add a new song to an album using the album ID
+@app.post("/albums/{album_id}/songs", response_model=SongModel)
+async def create_song_for_album(album_id: int, song: SongBase, db: db_dependency):
+	album = db.query(models.Album).filter(models.Album.id == album_id).first()
+	if not album:
+		raise HTTPException(status_code=404, detail="Album not found")
+	new_song = models.Song(**song.model_dump())
+	new_song.album_id = album_id
+	db.add(new_song)
+	db.commit()
+	db.refresh(new_song)
+	return new_song
+
+# Modify an artist's information using the artist ID
+@app.put("/artists/{artist_id}", response_model=ArtistModel)
+async def update_artist(artist_id: int, artist: ArtistBase, db: db_dependency):
+	artist = db.query(models.Artist).filter(models.Artist.id == artist_id).first()
+	if not artist:
+		raise HTTPException(status_code=404, detail="Artist not found")
+	for key, value in artist.dict().items():
+		setattr(artist, key, value)
+	db.commit()
+	db.refresh(artist)
+	return artist
