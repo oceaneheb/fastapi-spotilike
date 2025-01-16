@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ListAlbum from "./pages/ListAlbum";
+import AlbumDetails from './pages/AlbumDetails';
 import './App.css';
 import NavBar from "./components/Navbar";
 
@@ -11,7 +12,8 @@ function App() {
         <NavBar />
         <BrowserRouter>
         <Routes>
-          <Route path='/albums/' element={<ListAlbum />}></Route>
+          <Route path='/' element={<ListAlbum />}></Route>
+          <Route path="/album/:id" element={<AlbumDetails />}></Route>
         </Routes>
       </BrowserRouter>
     </div>
