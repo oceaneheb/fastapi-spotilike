@@ -137,6 +137,20 @@ async def get_genres(db: db_dependency):
 	return genres
 
 # Artists
+# Get all artists
+@router.get("/api/artists", response_model=List[ArtistModel])
+async def get_artists(db: db_dependency):
+	artists = db.query(models.Artist).all()
+	return artists
+
+# Get artist's detail using the artist ID
+@router.get("/api/artists/{artist_id}", response_model=ArtistModel)
+async def get_artist_detail(artist_id: int, db: db_dependency):
+	db_artist = db.query(models.Artist).filter(models.Artist.id == artist_id).first()
+	if not db_artist:
+		raise HTTPException(status_code=404, detail="Aucun artiste avec l'ID demandé")
+	return db_artist
+
 # Supprimer un artiste par id
 @router.delete("/api/artists/{artist_id}", response_model=ArtistModel)
 async def delete_artist(artist_id: int, db: db_dependency):
