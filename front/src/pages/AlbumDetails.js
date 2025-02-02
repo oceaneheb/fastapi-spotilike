@@ -21,8 +21,8 @@ const AlbumDetails = () => {
 
     return (
         <div className="container">
-            <h1>{album.title}</h1>
-            <img src={album.cover} alt={album.title} style={{ width: '300px' }} />
+            <h1 style={{marginBottom: '30px'}}>{album.title}</h1>
+            <img src={album.cover} alt={album.title} style={{ width: '300px', marginBottom: '30px' }} />
             <p><strong>Date de sortie :</strong> {album.release_date}</p>
             {/* <p><strong>Description :</strong> {album.description}</p> */}
         </div>

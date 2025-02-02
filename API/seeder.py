@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from models import User, Artist, Album, Song, Genre, SongGenre
 
 def seed_data(session: Session):
-    path_to_artists_avatars = "static/images/artists/"
-    path_to_albums_covers = "static/images/albums/"
+    path_to_artists_avatars = "/assets/artists/"
+    path_to_albums_covers = "/assets/albums/"
 
     # Seed Users
     user1 = User(name="John Doe",email="john@example.com", password="password123")
@@ -11,18 +11,18 @@ def seed_data(session: Session):
     
 
     # Seed Artists
-    artist1 = Artist(name="The Beatles", avatar=f"{path_to_artists_avatars}TheBeatles.jpg", biography="Legendary band from Liverpool")
-    artist2 = Artist(name="Taylor Swift", avatar=f"{path_to_artists_avatars}TaylorSwift.jpg", biography="American singer-songwriter")
+    artist1 = Artist(name="The Beatles", avatar=f"{path_to_artists_avatars}the-beatles.jpg", biography="Legendary band from Liverpool")
+    artist2 = Artist(name="Taylor Swift", avatar=f"{path_to_artists_avatars}taylor-swift.jpg", biography="American singer-songwriter")
 
     # Seed Albums
 	# Beatles
-    album1 = Album(title="Abbey Road", artist=artist1, release_date="1969-09-26", cover=f"{path_to_albums_covers}AbbeyRoad.jpg")
-    album2 = Album(title="Sgt. Pepper's Lonely Hearts Club Band", artist=artist1, release_date="1967-05-26", cover=f"{path_to_albums_covers}SgtPepper.jpg")
-    album3 = Album(title="Revolver", artist=artist1, release_date="1966-08-05", cover=f"{path_to_albums_covers}Revolver.jpg")
+    album1 = Album(title="Abbey Road", artist=artist1, release_date="1969-09-26", cover=f"{path_to_albums_covers}abbey-road.jpg")
+    album2 = Album(title="Sgt. Pepper's Lonely Hearts Club Band", artist=artist1, release_date="1967-05-26", cover=f"{path_to_albums_covers}club-band.jpg")
+    album3 = Album(title="Revolver", artist=artist1, release_date="1966-08-05", cover=f"{path_to_albums_covers}revolver.jpg")
 	# Taylor
     album4 = Album(title="1989", artist=artist2, release_date="2014-10-27", cover=f"{path_to_albums_covers}1989.jpg")
-    album5 = Album(title="Red", artist=artist2, release_date="2012-10-22", cover=f"{path_to_albums_covers}Red.jpg")
-    album6 = Album(title="Fearless", artist=artist2, release_date="2008-11-11", cover=f"{path_to_albums_covers}Fearless.jpg")
+    album5 = Album(title="Red", artist=artist2, release_date="2012-10-22", cover=f"{path_to_albums_covers}red.jpg")
+    album6 = Album(title="Fearless", artist=artist2, release_date="2008-11-11", cover=f"{path_to_albums_covers}fearless.jpg")
 
     # Seed Songs
     # Abbey Road
