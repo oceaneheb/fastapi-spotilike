@@ -11,8 +11,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 
 router = APIRouter(
-	prefix="/auth",
-	tags=["auth"]
+	tags=["Authentication"],
 )
 
 SECRET_KEY = '3Z6gpUkVI4wvE5WL8X3KVpT7uRgfl341'
@@ -39,13 +38,19 @@ def get_db():
 
 db_dependencies = Annotated[Session, Depends(get_db)]
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/api/users/signup", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependencies, create_user_request: CreateUserRequest):
 	create_user_model = User(name=create_user_request.name, email=create_user_request.email, password=bcrypt_context.hash(create_user_request.password))
+	if db.query(User).filter(User.email == create_user_model.email).first():
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+	if db.query(User).filter(User.name == create_user_model.name).first():
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Name already registered")
 	db.add(create_user_model)
 	db.commit()
+	db.refresh(create_user_model)
+	return create_user_model
 
-@router.post("/token", response_model=Token)
+@router.post("/api/users/login", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependencies):
 	user = authenticate_user(form_data.username, form_data.password, db)
 	if not user:

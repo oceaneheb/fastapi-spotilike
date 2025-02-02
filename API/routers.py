@@ -78,14 +78,6 @@ models.Base.metadata.create_all(bind=engine)
 # Endpoints
 
 # Users
-# Créer un nouvel utilisateur
-@router.post("/api/users/signup", response_model=UserModel)
-async def create_user(user: UserBase, db: db_dependency):
-	db_user = models.User(**user.dict())
-	db.add(db_user)
-	db.commit()
-	db.refresh(db_user)
-	return db_user
 
 # Supprimer un utilisateur par id
 @router.delete("/api/users/{user_id}", response_model=UserModel)
