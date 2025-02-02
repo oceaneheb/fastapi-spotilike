@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import SessionLocal, engine
 import models
+from auth import get_current_user
 
 router = APIRouter()
 
@@ -70,6 +71,7 @@ def get_db():
 		db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[UserModel, Depends(get_current_user)]
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -87,7 +89,9 @@ async def create_user(user: UserBase, db: db_dependency):
 
 # Supprimer un utilisateur par id
 @router.delete("/api/users/{user_id}", response_model=UserModel)
-async def delete_user(user_id: int, db: db_dependency):
+async def delete_user(initiator: user_dependency ,user_id: int, db: db_dependency):
+	if initiator is None:
+		raise HTTPException(status_code=401, detail="Vous n'êtes pas autorisé à effectuer cette action")
 	db_user = db.query(models.User).filter(models.User.id == user_id).first()
 	if db_user is None:
 		raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
@@ -121,7 +125,9 @@ async def create_album(album: AlbumBase, db: db_dependency):
 
 # Supprimer un album par id
 @router.delete("/api/albums/{album_id}", response_model=AlbumModel)
-async def delete_album(album_id: int, db: db_dependency):
+async def delete_album(initiator: user_dependency, album_id: int, db: db_dependency):
+	if initiator is None:
+		raise HTTPException(status_code=401, detail="Vous n'êtes pas autorisé à effectuer cette action")
 	db_album = db.query(models.Album).filter(models.Album.id == album_id).first()
 	if db_album is None:
 		raise HTTPException(status_code=404, detail="Album non trouvé")
@@ -153,7 +159,9 @@ async def get_artist_detail(artist_id: int, db: db_dependency):
 
 # Supprimer un artiste par id
 @router.delete("/api/artists/{artist_id}", response_model=ArtistModel)
-async def delete_artist(artist_id: int, db: db_dependency):
+async def delete_artist(initiator: user_dependency, artist_id: int, db: db_dependency):
+	if initiator is None:
+		raise HTTPException(status_code=401, detail="Vous n'êtes pas autorisé à effectuer cette action")
 	db_artist = db.query(models.Artist).filter(models.Artist.id == artist_id).first()
 	if db_artist is None:
 		raise HTTPException(status_code=404, detail="Artiste non trouvé")
