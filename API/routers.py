@@ -157,6 +157,12 @@ async def delete_artist(initiator: user_dependency, artist_id: int, db: db_depen
 	db_artist = db.query(models.Artist).filter(models.Artist.id == artist_id).first()
 	if db_artist is None:
 		raise HTTPException(status_code=404, detail="Artiste non trouvé")
+	db_artist_songs = db.query(models.Song).filter(models.Song.artist_id == artist_id).all()
+	for song in db_artist_songs:
+		db.delete(song)
+	db_artist_albums = db.query(models.Album).filter(models.Album.artist_id == artist_id).all()
+	for album in db_artist_albums:
+		db.delete(album)
 	db.delete(db_artist)
 	db.commit()
 	return db_artist
