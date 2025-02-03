@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from database import SessionLocal, engine
 import models
 from auth import get_current_user
+from starlette.responses import RedirectResponse
 
 router = APIRouter()
 
@@ -232,3 +233,8 @@ async def update_genre(genre_id: int, genre: GenreBase, db: db_dependency):
 	db.commit()
 	db.refresh(db_genre)
 	return db_genre
+
+# Redirects root to /docs
+@router.get("/")
+async def redirect_to_docs():
+	return RedirectResponse(url="/docs")
