@@ -6,8 +6,8 @@ def seed_data(session: Session):
     path_to_albums_covers = "/assets/albums/"
 
     # Seed Users
-    user1 = User(name="John Doe",email="john@example.com", password="password123")
-    user2 = User(name="Jane Smith", email="jane@example.com", password="password456")
+    user1 = User(name="John Doe",email="john@example.com", password="$2y$10$GoJakXgXwhqNZ5xoPKJD2.gbLG6bZtBL45s3elBtaPV9ldGEhLY/S") # password: password123
+    user2 = User(name="Jane Smith", email="jane@example.com", password="$2y$10$I8JhoaS.8sJoN4aNNfKEOucta1M2f7WQYnygJhXWwGJ/ff86qUjY6") # password: password456
     
 
     # Seed Artists
