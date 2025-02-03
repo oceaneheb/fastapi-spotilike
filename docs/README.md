@@ -18,7 +18,6 @@ py -m venv venv
 3. Installer les dépendances nécessaires :
 ```
 pip install -r requirements.txt
-pip install fastapi uvicorn
 ```
 4. Lancer l'API avec la commande :
 ```
@@ -50,7 +49,7 @@ npm install
 ```
 3. Lancer l'application React
 ```
-npm run dev
+npm start
 ```
 
 # Documentation de l'API
